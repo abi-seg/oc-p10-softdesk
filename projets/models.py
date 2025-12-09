@@ -33,6 +33,9 @@ class Contributeur(models.Model):
     def __str__(self):
         return f"{self.utilisateur.username} - {self.projet.titre} ({self.role})"
     
+    class Meta:
+        unique_together = ('utilisateur', 'projet')
+    
 class Probleme(models.Model):
         """Modèle représentant un problème dans un projet."""
 
