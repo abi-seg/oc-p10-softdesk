@@ -19,10 +19,17 @@ from django.contrib import admin
 from django.urls import path, include
 from .views import index
 
+from rest_framework.routers import DefaultRouter
+from utilisateurs.views import UtilisateurViewSet
+from projets.views import ProjectViewSet  # ✅ make sure spelling matches
+
+router = DefaultRouter()
+router.register(r'users', UtilisateurViewSet, basename='users')
+router.register(r'projects', ProjectViewSet, basename='projects')
+
 urlpatterns = [
     path('', index),
-    path("admin/", admin.site.urls),
+    path('admin/', admin.site.urls),
+    path('api/', include(router.urls)),  # ✅ only one router here!
     path('api-auth/', include('rest_framework.urls')),
-    path('api/', include('utilisateurs.urls')),
-    path('api/', include('projets.urls')),
 ]
