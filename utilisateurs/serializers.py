@@ -5,6 +5,9 @@ class UtilisateurSerializer(serializers.ModelSerializer):
     class Meta:
         model = Utilisateur
         fields = ['id', 'username', 'age', 'can_be_contacted', 'can_data_be_shared',]    
+        extra_kwargs = {
+            'id': {'read_only': True},
+        }
 
     def validate_age(self, value):
         if value < 15:
