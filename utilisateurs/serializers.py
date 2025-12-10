@@ -4,7 +4,7 @@ from .models import Utilisateur
 class UtilisateurSerializer(serializers.ModelSerializer):
     class Meta:
         model = Utilisateur
-        fields = ['id', 'username', 'age', 'peut_etre_contacte', 'partage_donnees']    
+        fields = ['id', 'username', 'age', 'can_be_contacted', 'can_data_be_shared',]    
 
     def validate_age(self, value):
         if value < 15:

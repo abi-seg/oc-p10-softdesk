@@ -1,8 +1,8 @@
 from rest_framework import serializers
-from .models import Projet
+from .models import Project
 
-class ProjetSerializer(serializers.ModelSerializer):
+class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
-        model = Projet
+        model = Project
         fields = '__all__'
         read_only_fields = ['auteur', 'date_creation']

@@ -1,13 +1,13 @@
 from rest_framework import viewsets, permissions
-from .models import Projet
-from projets.serializers import ProjetSerializer
+from .models import Project
+from projets.serializers import ProjectSerializer
 
-class ProjetViewSet(viewsets.ModelViewSet):
-    serializer_class = ProjetSerializer
+class ProjectViewSet(viewsets.ModelViewSet):
+    serializer_class = ProjectSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Projet.objects.filter(auteur=self.request.user)
+        return Project.objects.filter(auteur=self.request.user)
 
     def perform_create(self, serializer):
         serializer.save(auteur=self.request.user)

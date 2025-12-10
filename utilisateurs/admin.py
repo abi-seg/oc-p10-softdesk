@@ -5,11 +5,11 @@ from .models import Utilisateur
 @admin.register(Utilisateur)
 class UtilisateurAdmin(UserAdmin):
     model = Utilisateur
-    list_display = ('username', 'age', 'peut_etre_contacte', 'partage_donnees', 'is_staff')
+    list_display = ('username', 'age', 'can_be_contacted', 'can_data_be_shared', 'is_staff')
 
     fieldsets = UserAdmin.fieldsets + (
         ('Informations supplémentaires', {
-            'fields': ('age', 'peut_etre_contacte', 'partage_donnees')
+            'fields': ('age', 'can_be_contacted', 'can_data_be_shared'),
         }),
     )
 

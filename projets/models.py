@@ -2,7 +2,7 @@ from django.db import models
 from utilisateurs.models import Utilisateur
 import uuid
 
-class Projet(models.Model):
+class Project(models.Model):
     TYPE_CHOICES = [
         ('BACKEND', 'Back-end'),
         ('FRONTEND', 'Front-end'),
@@ -10,73 +10,85 @@ class Projet(models.Model):
         ('ANDROID', 'Android'),
     ]
 
-    titre = models.CharField(max_length=255)
+    title = models.CharField(max_length=255)
     description = models.TextField()
     type = models.CharField(max_length=20, choices=TYPE_CHOICES)
-    auteur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, related_name='projets')
-    date_creation = models.DateTimeField(auto_now_add=True)
+    author = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, related_name='projects')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.titre
+        return self.title
 
-class Contributeur(models.Model):
-    """Modèle représentant un contributeur à un projet."""
-    ROLE_CHOICES = [
-        ('AUTEUR', 'Auteur'),
-        ('CONTRIBUTEUR', 'Contributeur'),
-    ]
-    utilisateur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE)
-    projet = models.ForeignKey(Projet, on_delete=models.CASCADE)
-    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='CONTRIBUTEUR')
-    date_ajout = models.DateTimeField(auto_now_add=True)
-
-    def __str__(self):
-        return f"{self.utilisateur.username} - {self.projet.titre} ({self.role})"
-    
     class Meta:
-        unique_together = ('utilisateur', 'projet')
-    
-class Probleme(models.Model):
-        """Modèle représentant un problème dans un projet."""
+        db_table = 'projets_projet'  # keep old table
+        verbose_name = "Project"
+        verbose_name_plural = "Projects"
 
-        BALISE_CHOICES = [
-            ('BUG', 'Bug'),
-            ('FEATURE','Fonctionnalité'),
-            ('TASK', 'Tâche'),  
-        ]
-      
-        PRIORITE_CHOICES = [
-            ('LOW', 'Faible'),
-            ('MEDIUM', 'Moyenne'),
-            ('HIGH', 'Haute'),
-        ]
-        STATUT_CHOICES = [
-            ('TODO', 'À faire'),
-            ('IN_PROGRESS', 'En cours'),
-            ('FINISHED', 'Terminé'),
-        ]
-        titre = models.CharField(max_length=255)
-        description = models.TextField()
-        balise = models.CharField(max_length=10, choices=BALISE_CHOICES)
-        priorite = models.CharField(max_length=10, choices=PRIORITE_CHOICES)
-        statut = models.CharField(max_length=15, choices=STATUT_CHOICES, default='TODO')
-        projet = models.ForeignKey(Projet, on_delete=models.CASCADE, related_name='problemes')
-        auteur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, related_name='problemes_crees')
-        assigne_a = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL, null=True, 
-                                      related_name='problemes_assignes')
-        date_creation = models.DateTimeField(auto_now_add=True)
 
-        def __str__(self):
-            return f"{self.titre} ({self.balise})"
+class Contributor(models.Model):
+    ROLE_CHOICES = [
+        ('AUTHOR', 'Author'),
+        ('CONTRIBUTOR', 'Contributor'),
+    ]
 
-class Commentaire(models.Model):
-    """Modèle représentant un commentaire sur un problème."""
+    user = models.ForeignKey(Utilisateur, on_delete=models.CASCADE)
+    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='CONTRIBUTOR')
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.user.username} - {self.project.title} ({self.role})"
+
+    class Meta:
+        db_table = 'projets_contributeur'
+        unique_together = ('user', 'project')
+
+
+class Issue(models.Model):
+    TAG_CHOICES = [
+        ('BUG', 'Bug'),
+        ('FEATURE','Feature'),
+        ('TASK', 'Task'),  
+    ]
+  
+    PRIORITY_CHOICES = [
+        ('LOW', 'Low'),
+        ('MEDIUM', 'Medium'),
+        ('HIGH', 'High'),
+    ]
+
+    STATUS_CHOICES = [
+        ('TODO', 'To do'),
+        ('IN_PROGRESS', 'In progress'),
+        ('FINISHED', 'Finished'),
+    ]
+
+    title = models.CharField(max_length=255)
+    description = models.TextField()
+    tag = models.CharField(max_length=10, choices=TAG_CHOICES)
+    priority = models.CharField(max_length=10, choices=PRIORITY_CHOICES)
+    status = models.CharField(max_length=15, choices=STATUS_CHOICES, default='TODO')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='issues')
+    author = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, related_name='created_issues')
+    assigned_to = models.ForeignKey(Utilisateur, on_delete=models.SET_NULL, null=True, related_name='assigned_issues')
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.title} ({self.tag})"
+
+    class Meta:
+        db_table = 'projets_probleme'
+
+
+class Comment(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     description = models.TextField()
-    probleme = models.ForeignKey('Probleme', on_delete=models.CASCADE, related_name='commentaires')
-    auteur = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, related_name='commentaires')
-
-    date_creation = models.DateTimeField(auto_now_add=True)
+    issue = models.ForeignKey(Issue, on_delete=models.CASCADE, related_name='comments')
+    author = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, related_name='comments')
+    created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f"Commentaire de {self.auteur.username} sur {self.probleme.titre}"
+        return f"Comment by {self.author.username} on {self.issue.title}"
+
+    class Meta:
+        db_table = 'projets_commentaire'
