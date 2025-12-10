@@ -7,9 +7,12 @@ class ProjectViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        return Project.objects.filter(auteur=self.request.user)
-
+        user = self.request.user
+        if not user or not user.is_authenticated:
+            return Project.objects.none()
+        return Project.objects.filter(author=self.request.user)
+    
     def perform_create(self, serializer):
-        serializer.save(auteur=self.request.user)
+        serializer.save(author=self.request.user)
 
 
