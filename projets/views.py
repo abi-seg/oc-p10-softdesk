@@ -1,6 +1,6 @@
-from rest_framework import viewsets, permissions
-from .models import Project
-from projets.serializers import ProjectSerializer
+from rest_framework import viewsets, permissions, serializers
+from .models import Project, Contributor, Utilisateur
+from .serializers import ProjectSerializer, ContributorSerializer
 
 class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
@@ -19,6 +19,33 @@ class ProjectViewSet(viewsets.ModelViewSet):
         return Project.objects.filter(author=self.request.user)
     
     def perform_create(self, serializer):
-        serializer.save(author=self.request.user)
+       serializer.save(author=self.request.user) # save author as project creator
 
+        
 
+class ContributorViewSet(viewsets.ModelViewSet):
+
+    serializer_class = ContributorSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff or user.is_superuser:
+            return Contributor.objects.all()
+        
+        return Contributor.objects.filter(project__author=self.request.user) | Contributor.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        project_id = self.request.data.get('project')
+        user_id = self.request.data.get('user')
+
+        try:
+            project = Project.objects.get(id=project_id)
+            user = Utilisateur.objects.get(id=user_id)
+
+            if Contributor.objects.filter(project=project, user=user).exists():
+                raise serializers.ValidationError("This user is already a contributor to the project.")
+            
+            serializer.save(project=project, user=user)
+        except (Project.DoesNotExist, Utilisateur.DoesNotExist):
+            raise serializers.ValidationError("Invalid user or project ID.")
