@@ -21,15 +21,16 @@ from .views import index
 
 from rest_framework.routers import DefaultRouter
 from utilisateurs.views import UtilisateurViewSet
-from projets.views import ProjectViewSet  # ✅ make sure spelling matches
+from projets.views import ProjectViewSet, ContributorViewSet  # 
 
 router = DefaultRouter()
 router.register(r'users', UtilisateurViewSet, basename='users')
 router.register(r'projects', ProjectViewSet, basename='projects')
+router.register(r'contributors', ContributorViewSet, basename='contributors')  
 
 urlpatterns = [
     path('', index),
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),  # ✅ only one router here!
+    path('api/', include(router.urls)),  # 
     path('api-auth/', include('rest_framework.urls')),
 ]
