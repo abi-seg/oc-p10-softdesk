@@ -15,6 +15,17 @@ Prérequis:
   pipenv installé (pip install --user pipenv)
   git
 
+Fonctionnalités
+
+-  Authentification via DRF (Basic Auth)
+-  Utilisateur avec modèle personnalisé
+-  Création et suppression de projets
+-  Gestion des contributeurs par projets
+-  Système de suivi d’issues
+-  Interface de commentaires sur les issues
+-  Routes RESTful nested avec permissions
+-  Pagination DRF par défaut
+
 Configuration initiale du projet
 
   Cloner le dépot:
@@ -60,6 +71,14 @@ Configuration initiale du projet
        Le projet sera disponible à l'adresse : http://127.0.0.1:8000
        Connectez-vous à l’admin sur http://127.0.0.1:8000/admin
      
-     
+10. Routes principales de l’API
+
+Endpoint	  
+      
+/api/projects/	--> CRUD projets
+/api/projects/<id>/contributors/ --> Gérer les membres
+/api/projects/<id>/issues/ --> Gérer les bugs
+/api/projects/<id>/issues/<id>/comments/ -->	Gérer les commentaires
+/api/users/ --> Lecture des utilisateurs   
      
    
