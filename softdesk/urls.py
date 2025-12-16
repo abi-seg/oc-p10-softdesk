@@ -18,20 +18,16 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from .views import index
-
 from rest_framework.routers import DefaultRouter
 from utilisateurs.views import UtilisateurViewSet
-from projets.views import ProjectViewSet, ContributorViewSet, IssueViewSet # 
-
 router = DefaultRouter()
 router.register(r'users', UtilisateurViewSet, basename='users')
-router.register(r'projects', ProjectViewSet, basename='projects')
-router.register(r'contributors', ContributorViewSet, basename='contributors') 
-router.register(r'issues', IssueViewSet, basename='issues') 
+
 
 urlpatterns = [
-    path('', index),
+    path('', index, name='index'),
     path('admin/', admin.site.urls),
-    path('api/', include(router.urls)),  # 
+    path('api/', include('projets.urls')),  # 
     path('api-auth/', include('rest_framework.urls')),
+    path('api/', include(router.urls)),  # Include the utilisateur routes
 ]

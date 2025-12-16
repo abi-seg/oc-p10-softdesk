@@ -1,6 +1,9 @@
 from rest_framework import viewsets, permissions, serializers
-from .models import Project, Contributor, Utilisateur, Issue
-from .serializers import ProjectSerializer, ContributorSerializer, IssueSerializer
+from .models import Project, Contributor, Utilisateur, Issue, Comment
+from .serializers import ProjectSerializer, ContributorSerializer, IssueSerializer, commentSerializer
+from .permissions import IsAuthorOrReadOnly
+from rest_framework.permissions import IsAuthenticated
+
 
 class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
@@ -29,49 +32,56 @@ class ContributorViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
-        if user.is_staff or user.is_superuser:
-            return Contributor.objects.all()
         
-        return Contributor.objects.filter(project__author=self.request.user) | Contributor.objects.filter(user=self.request.user)
+        return Contributor.objects.filter(project_id=self.kwargs['project_pk'])
     
     def perform_create(self, serializer):
-        project_id = self.request.data.get('project')
+        project = Project.objects.get(pk=self.kwargs['project_pk'])
         user_id = self.request.data.get('user')
+        user = Utilisateur.objects.get(pk=user_id)
 
-        try:
-            project = Project.objects.get(id=project_id)
-            user = Utilisateur.objects.get(id=user_id)
-
-            if Contributor.objects.filter(project=project, user=user).exists():
+        
+        if Contributor.objects.filter(project=project, user=user).exists():
                 raise serializers.ValidationError("This user is already a contributor to the project.")
             
-            serializer.save(project=project, user=user)
-        except (Project.DoesNotExist, Utilisateur.DoesNotExist):
-            raise serializers.ValidationError("Invalid user or project ID.")
+        serializer.save(project=project, user=user)
+      
         
 class IssueViewSet(viewsets.ModelViewSet):
     serializer_class = IssueSerializer
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        user = self.request.user
-        if user.is_staff or user.is_superuser:
-            return Issue.objects.all()
-        
-        return Issue.objects.filter(project__author=self.request.user) | Issue.objects.filter(assigned_to=self.request.user)
-    
+        project_id = self.kwargs.get('project_pk')
+        return Issue.objects.filter(project_id=project_id)
+
     def perform_create(self, serializer):
-        project_id = self.request.data.get('project')
+        project = Project.objects.get(pk=self.kwargs['project_pk'])
         assigned_to_id = self.request.data.get('assigned_to')
+        assigned_to = Utilisateur.objects.get(pk=assigned_to_id) if assigned_to_id else None
 
-        try:
-            project = Project.objects.get(id=project_id)
-            assigned_to = Utilisateur.objects.get(id=assigned_to_id) if assigned_to_id else None
+        # Ensure only project author can create issues
 
-            if project.author != self.request.user:
+        if project.author != self.request.user:
                 raise serializers.ValidationError("You are not the author of this project.")
 
-            serializer.save(project=project, author=self.request.user, assigned_to=assigned_to)
-        except (Project.DoesNotExist, Utilisateur.DoesNotExist):
-            raise serializers.ValidationError("Invalid project or assignee ID.")
+        serializer.save(project=project, author=self.request.user, assigned_to=assigned_to)
+            
+        
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = commentSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if user.is_staff or user.is_superuser:
+            return Comment.objects.all()
+        
+        return Comment.objects.filter(issue_id=self.kwargs['issue_pk'])
+    
+    def perform_create(self, serializer):
+       
+            issue = Issue.objects.get(pk=self.kwargs['issue_pk'])
+
+            serializer.save(issue=issue, author=self.request.user)
+        

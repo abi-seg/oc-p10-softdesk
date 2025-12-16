@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Project, Contributor, Utilisateur,Issue
+from .models import Project, Contributor, Utilisateur,Issue, Comment
 
 class ProjectSerializer(serializers.ModelSerializer):
 
@@ -39,18 +39,32 @@ class IssueSerializer(serializers.ModelSerializer):
         queryset=Utilisateur.objects.all(),
         
     )
-    project = serializers.PrimaryKeyRelatedField(
-        queryset=Project.objects.all() 
-    )
+    project = serializers.StringRelatedField(read_only=True)  # Display project's title
 
     class Meta:
         model = Issue
         fields = ['id', 'title', 'description', 'tag', 'priority', 'status', 'author', 'assigned_to', 'project', 'created_at']
-        read_only_fields = ['id', 'author',  'created_at']
+        read_only_fields = ['id', 'author',  'project', 'created_at']
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
         rep['author'] = instance.author.username  # Display author's username
         rep['assigned_to'] = instance.assigned_to.username if instance.assigned_to else None  # Display assignee's username
         rep['project'] = instance.project.title  # Display project title
+        return rep
+    
+class commentSerializer(serializers.ModelSerializer):
+    author = serializers.StringRelatedField(read_only=True)  # Display author's username
+    issue = serializers.PrimaryKeyRelatedField(
+        queryset=Issue.objects.all()
+    )
+
+    class Meta:
+        model = Comment
+        fields = ['id', 'description', 'author', 'issue', 'created_at']
+        read_only_fields = ['id', 'author', 'created_at']
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        rep['issue'] = instance.issue.title  # Display issue title instead of ID
         return rep

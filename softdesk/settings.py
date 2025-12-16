@@ -123,3 +123,14 @@ STATIC_URL = "static/"
 AUTH_USER_MODEL = "utilisateurs.Utilisateur"
 
 LOGIN_REDIRECT_URL = "/api/users/"
+
+REST_FRAMEWORK = {
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 10,
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.BasicAuthentication',
+    ],
+}
