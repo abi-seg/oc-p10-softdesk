@@ -31,8 +31,8 @@ class Contributor(models.Model):
         ('CONTRIBUTOR', 'Contributor'),
     ]
 
-    user = models.ForeignKey(Utilisateur, on_delete=models.CASCADE)
-    project = models.ForeignKey(Project, on_delete=models.CASCADE)
+    user = models.ForeignKey(Utilisateur, on_delete=models.CASCADE, related_name='contributions')
+    project = models.ForeignKey(Project, on_delete=models.CASCADE, related_name='contributors')
     role = models.CharField(max_length=20, choices=ROLE_CHOICES, default='CONTRIBUTOR')
     added_at = models.DateTimeField(auto_now_add=True)
 

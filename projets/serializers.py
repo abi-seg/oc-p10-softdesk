@@ -66,5 +66,7 @@ class commentSerializer(serializers.ModelSerializer):
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
-        rep['issue'] = instance.issue.title  # Display issue title instead of ID
+        rep['issue'] = instance.issue.title 
+        rep['project'] = instance.issue.project.title  # Display project title instead of ID
+        rep['project_author'] = instance.issue.project.author.username  # Display project author's username
         return rep

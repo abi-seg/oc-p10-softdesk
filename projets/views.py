@@ -7,19 +7,10 @@ from rest_framework.permissions import IsAuthenticated
 
 class ProjectViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [permissions.IsAuthenticated, IsAuthorOrReadOnly]
 
     def get_queryset(self):
-        user = self.request.user
-        if not user or not user.is_authenticated:
-            return Project.objects.none()
-        
-        # Admin see all projects
-        if user.is_staff or user.is_superuser:
-            return Project.objects.select_related('author').all()
-        
-        # Regular users see only their projects
-        return Project.objects.select_related('author').filter(contributors__user=user).distinct()
+       return Project.objects.all()
     
     def perform_create(self, serializer):
        serializer.save(author=self.request.user) # save author as project creator
