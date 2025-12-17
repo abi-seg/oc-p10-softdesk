@@ -16,10 +16,10 @@ class ProjectViewSet(viewsets.ModelViewSet):
         
         # Admin see all projects
         if user.is_staff or user.is_superuser:
-            return Project.objects.all()
+            return Project.objects.select_related('author').all()
         
         # Regular users see only their projects
-        return Project.objects.filter(author=self.request.user)
+        return Project.objects.select_related('author').filter(contributors__user=user).distinct()
     
     def perform_create(self, serializer):
        serializer.save(author=self.request.user) # save author as project creator
@@ -33,7 +33,7 @@ class ContributorViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         
-        return Contributor.objects.filter(project_id=self.kwargs['project_pk'])
+        return Contributor.objects.select_related('project', 'user').filter(project_id=self.kwargs['project_pk'])   
     
     def perform_create(self, serializer):
         project = Project.objects.get(pk=self.kwargs['project_pk'])
@@ -53,7 +53,7 @@ class IssueViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         project_id = self.kwargs.get('project_pk')
-        return Issue.objects.filter(project_id=project_id)
+        return Issue.objects.select_related('project', 'author', 'assigned_to').filter(project_id=project_id)
 
     def perform_create(self, serializer):
         project = Project.objects.get(pk=self.kwargs['project_pk'])
@@ -77,7 +77,7 @@ class CommentViewSet(viewsets.ModelViewSet):
         if user.is_staff or user.is_superuser:
             return Comment.objects.all()
         
-        return Comment.objects.filter(issue_id=self.kwargs['issue_pk'])
+        return Comment.objects.select_related('issue', 'author').filter(issue_id=self.kwargs['issue_pk'])
     
     def perform_create(self, serializer):
        
