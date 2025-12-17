@@ -20,13 +20,13 @@ class ContributorSerializer(serializers.ModelSerializer):
     user = serializers.PrimaryKeyRelatedField(
         queryset = Utilisateur.objects.all()
     )
-    project = serializers.PrimaryKeyRelatedField(
-        queryset = Project.objects.all()
+    project = serializers.StringRelatedField(
+        read_only=True
         )
     class Meta:
         model = Contributor
         fields = ['id', 'user', 'project', 'role', 'added_at']
-        read_only_fields = ['id', 'added_at']
+        read_only_fields = ['id','project', 'added_at']
 
     def to_representation(self, instance):
         rep = super().to_representation(instance)
@@ -55,9 +55,9 @@ class IssueSerializer(serializers.ModelSerializer):
     
 class commentSerializer(serializers.ModelSerializer):
     author = serializers.StringRelatedField(read_only=True)  # Display author's username
-    issue = serializers.PrimaryKeyRelatedField(
-        queryset=Issue.objects.all()
-    )
+    issue = serializers.StringRelatedField(read_only=True)  # Display issue's title
+        
+  
 
     class Meta:
         model = Comment
