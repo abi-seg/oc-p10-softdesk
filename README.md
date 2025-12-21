@@ -2,13 +2,19 @@ SoftDesk - API RESTful avec Django REST Framework
 
 Présentation:
   SoftDesk est une application de suivi de projets et de bugs développée avec Django et Django REST Framework.  
-  Ce projet permet aux utilisateurs de créer des projets, y ajouter des contributeurs, signaler des problèmes, et commenter.
+  Ce projet permet aux utilisateurs de:
+     Créer des projets, 
+     Ajouter des contributeurs à chaque projet, 
+     Signaler des problèmes (issues), et 
+     Ajouter des commentaires collaboratifs sur les issues.
 
 Technologies utilisées:
   Python 3.10+
   Django 4.x
   Django REST Framework
   Pipenv
+  SQLite
+  Postman(pour tests API)
 
 Prérequis:
   Python installé (v3.10 ou plus)
@@ -17,14 +23,15 @@ Prérequis:
 
 Fonctionnalités
 
--  Authentification via DRF (Basic Auth)
--  Utilisateur avec modèle personnalisé
--  Création et suppression de projets
--  Gestion des contributeurs par projets
--  Système de suivi d’issues
--  Interface de commentaires sur les issues
--  Routes RESTful nested avec permissions
--  Pagination DRF par défaut
+-  Authentification sécurisée via JWT (DRF simpleJWT)
+-  Modèle utilisateur personnalisé (Utilisateur)
+- Création, modification et suppression de projets
+- Gestion des contributeurs (ajout/suppression)
+- Création d’issues liées à un projet
+- Interface de commentaires sur les issues
+- Routes imbriquées (Nested Routing)
+- Permissions basées sur les rôles (auteur, contributeur)
+- Pagination automatique avec DRF
 
 Configuration initiale du projet
 
@@ -73,7 +80,7 @@ Configuration initiale du projet
      
 10. Routes principales de l’API
 
-Endpoint	  
+Endpoints	  
       
 /api/projects/	--> CRUD projets
 /api/projects/<id>/contributors/ --> Gérer les membres
@@ -81,4 +88,10 @@ Endpoint
 /api/projects/<id>/issues/<id>/comments/ -->	Gérer les commentaires
 /api/users/ --> Lecture des utilisateurs   
      
+11. Authentification JWT
+     
+     POST /api/token/ → Connexion
+     POST /api/token/refresh/ → Rafraîchissement du token
+
+Toutes les routes sont sécurisées et nécessitent un token Bearer dans le header Authorization.
    
