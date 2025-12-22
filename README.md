@@ -1,4 +1,4 @@
-SoftDesk - API RESTful avec Django REST Framework
+# SoftDesk - API RESTful avec Django REST Framework
 
 Présentation:
   SoftDesk est une application de suivi de projets et de bugs développée avec Django et Django REST Framework.  
