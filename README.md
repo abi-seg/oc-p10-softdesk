@@ -23,7 +23,7 @@ Prérequis:
 
 Fonctionnalités
 
--  Authentification sécurisée via JWT (DRF simpleJWT)
+-  Authentification sécurisée via **JWT** (DRF simpleJWT)
 -  Modèle utilisateur personnalisé (Utilisateur)
 - Création, modification et suppression de projets
 - Gestion des contributeurs (ajout/suppression)
